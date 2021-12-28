@@ -364,42 +364,45 @@ async def _shuffle(ctx):
 @client.command(name='playlist')
 async def _playlist(ctx,url, tmp = 1):
 	'''Позволяет добавить целый плейлист в очередь(может работать нестабильно)'''
-	await ctx.send("Функция плейлистов временно не работает (Ютуб опять меняет принципы своей работы)")
 
-	# if url.find('https://www.youtube.com/playlist') == -1 or (tmp!=0 and tmp!=1):
-	# 	await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
-	# 	return
-	# try:
-	# 	voice_channel = ctx.author.voice.channel
-	# 	voice = ctx.channel.guild.voice_client
-	# 	if voice is None:
-	# 		voice = await voice_channel.connect()
-	# 		tmp = 0
-	# 	elif voice.channel != voice_channel:
-	# 		await voice.move_to(voice_channel)
-	# 	ydl = YTDLSource()
+	if (url.find('https://www.youtube.com/playlist') == -1 or (tmp!=0 and tmp!=1)) and url.find('https://youtube.com/playlist') == -1:
+		await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
+		return
+	elif url.find('https://youtube.com/playlist') == -1:
+		await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
+		return
 
-	# 	event_loop = asyncio.get_event_loop()
-	# 	await ctx.send("Подождите немного")
-	# 	with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
-	# 		info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(url,download=False))
-	# 	URL = info
-	# 	for i in URL['entries']:
-	# 		try:
-	# 			await loop_add(ctx, voice, i ,ctx.channel.guild.id, 0)
-	# 		except:
-	# 			pass
-	# 	await ctx.send("**Плейлист добавлен**")
-	# 	if tmp == 0:
-	# 		tmp = 1
-	# 		await audio_player_task(ctx, voice, ctx.channel.guild.id)
+	try:
+		voice_channel = ctx.author.voice.channel
+		voice = ctx.channel.guild.voice_client
+		if voice is None:
+			voice = await voice_channel.connect()
+			tmp = 0
+		elif voice.channel != voice_channel:
+			await voice.move_to(voice_channel)
+		ydl = YTDLSource()
+
+		event_loop = asyncio.get_event_loop()
+		await ctx.send("Подождите немного")
+		with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
+			info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(url,download=False))
+		URL = info
+		for i in URL['entries']:
+			try:
+				await loop_add(ctx, voice, i ,ctx.channel.guild.id, 0)
+			except:
+				pass
+		await ctx.send("**Плейлист добавлен**")
+		if tmp == 0:
+			tmp = 1
+			await audio_player_task(ctx, voice, ctx.channel.guild.id)
 
 
-	# except Exception as e:
-	# 	if tmp == 0:
-	# 		await add_playlist(ctx,url, 0)
-	# 	elif tmp == 1:
-	# 		await add_playlist(ctx,url)
+	except Exception as e:
+		if tmp == 0:
+			await add_playlist(ctx,url, 0)
+		elif tmp == 1:
+			await add_playlist(ctx,url)
 
 async def add_playlist(ctx,url, tmp = 1):
 	try:
