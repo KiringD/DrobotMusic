@@ -364,13 +364,14 @@ async def _shuffle(ctx):
 @client.command(name='playlist')
 async def _playlist(ctx,url, tmp = 1):
 	'''Позволяет добавить целый плейлист в очередь(может работать нестабильно)'''
-	if (url.find('https://www.youtube.com/playlist') == -1 or (tmp!=0 and tmp!=1)) and url.find('https://youtube.com/playlist') == -1:
+	if url.find('https://www.youtube.com/playlist') != -1 or url.find('https://youtube.com/playlist') != -1:
+		if tmp!=0 and tmp!=1:
+			await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
+			return
+	else:
 		await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
 		return
-	elif url.find('https://youtube.com/playlist') == -1:
-		await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
-		return
-		 
+
 	try:
 		voice_channel = ctx.author.voice.channel
 		voice = ctx.channel.guild.voice_client
