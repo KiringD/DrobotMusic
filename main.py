@@ -134,7 +134,7 @@ async def player(ctx, voice, info ,id):
 async def audio_player_task(ctx, voice, id):
 	timer = 0
 	while True:
-		timer += 1
+		timer += 2
 		if id in queues:
 			if queues[id] == ['final']:
 				queues.pop(id)
@@ -145,15 +145,15 @@ async def audio_player_task(ctx, voice, id):
 			if not voice.is_playing() and not voice.is_paused():
 				await player(ctx,voice,queues[id][0],id)
 				timer = 0				
-				await asyncio.sleep(1)
+				await asyncio.sleep(2)
 			else:
 				# print(0)
 				if not voice.is_paused():
 					timer = 0
-				await asyncio.sleep(1)
+				await asyncio.sleep(2)
 		except Exception as e:
 			# print(e,2)
-			await asyncio.sleep(1)
+			await asyncio.sleep(2)
 		if timer >= 1800:
 			try:
 				queues.pop(id)
