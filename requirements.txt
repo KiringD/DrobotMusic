@@ -2,4 +2,4 @@ youtube-dl
 discord.py
 asyncio
 PyNaCl
-youtube_search
+youtube-search-python

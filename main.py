@@ -10,7 +10,7 @@ from youtube_dl import YoutubeDL
 import math
 import random
 
-from youtube_search import YoutubeSearch  
+from youtubesearchpython import VideosSearch
 
 client = commands.Bot(command_prefix='-')  # prefix our commands with '.'
 
@@ -65,8 +65,6 @@ class YTDLSource():
 
 		self.uploader = info.get('uploader')
 		self.uploader_url = info.get('uploader_url')
-		date = info.get('upload_date')
-		self.upload_date = date[6:8] + '.' + date[4:6] + '.' + date[0:4]
 		self.title = info.get('title')
 		self.thumbnail = info.get('thumbnail')
 		self.duration = self.parse_duration(int(info.get('duration')))
@@ -204,23 +202,20 @@ async def _play(ctx, *, url):
 				with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 					info = ydl1.extract_info(url, download=False)
 				URL = info['url']
-				print(URL)
+				# print(URL)
 			else:
 				if url.find('https://youtu.be/')!=-1:
 					with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 						info = ydl1.extract_info(url, download=False)
 					URL = info['url']
-					print(URL)
+					# print(URL)
 				elif url.find('https:') == -1:
 					raise KeyError
 				else:
 					raise Exception
 		except KeyError:
-			print(1)
-			search = url
-			yt = YoutubeSearch(search, max_results=1).to_dict()
-			yt_id = yt[0]['id']
-			yt_url = 'https://www.youtube.com/watch?v='+yt_id
+			videosSearch = VideosSearch(url, limit = 1)
+			yt_url = videosSearch.result()['result'][0]['link']
 			print(yt_url)
 			with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 				info = ydl1.extract_info(yt_url, download=False)
@@ -260,23 +255,20 @@ async def _p(ctx, *, url):
 				with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 					info = ydl1.extract_info(url, download=False)
 				URL = info['url']
-				print(URL)
+				# print(URL)
 			else:
 				if url.find('https://youtu.be/')!=-1:
 					with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 						info = ydl1.extract_info(url, download=False)
 					URL = info['url']
-					print(URL)
+					# print(URL)
 				elif url.find('https:') == -1:
 					raise KeyError
 				else:
 					raise Exception
 		except KeyError:
-			print(1)
-			search = url
-			yt = YoutubeSearch(search, max_results=1).to_dict()
-			yt_id = yt[0]['id']
-			yt_url = 'https://www.youtube.com/watch?v='+yt_id
+			videosSearch = VideosSearch(url, limit = 1)
+			yt_url = videosSearch.result()['result'][0]['link']
 			print(yt_url)
 			with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 				info = ydl1.extract_info(yt_url, download=False)
@@ -285,7 +277,7 @@ async def _p(ctx, *, url):
 			# print(e)
 		try:
 			await loop_add(ctx, voice, info ,ctx.channel.guild.id, 1)
-		except Exception:
+		except:
 			pass
 		if tmp == 0:
 			tmp = 1
@@ -315,22 +307,20 @@ async def _insert(ctx, pos, *, url):
 				with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 					info = ydl1.extract_info(url, download=False)
 				URL = info['url']
-				print(URL)
+				# print(URL)
 			else:
 				if url.find('https://youtu.be/')!=-1:
 					with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 						info = ydl1.extract_info(url, download=False)
 					URL = info['url']
-					print(URL)
+					# print(URL)
 				elif url.find('https:') == -1:
 					raise KeyError
 				else:
 					raise Exception
 		except KeyError:
-			search = url
-			yt = YoutubeSearch(search, max_results=1).to_dict()
-			yt_id = yt[0]['id']
-			yt_url = 'https://www.youtube.com/watch?v='+yt_id
+			videosSearch = VideosSearch(url, limit = 1)
+			yt_url = videosSearch.result()['result'][0]['link']
 			print(yt_url)
 			with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
 				info = ydl1.extract_info(yt_url, download=False)
@@ -371,7 +361,7 @@ async def _playlist(ctx,url, tmp = 1):
 	else:
 		await ctx.send('Напишите команду в формате -playlist [ссылка на плейлист]')
 		return
-
+		 
 	try:
 		voice_channel = ctx.author.voice.channel
 		voice = ctx.channel.guild.voice_client
@@ -380,16 +370,20 @@ async def _playlist(ctx,url, tmp = 1):
 			tmp = 0
 		elif voice.channel != voice_channel:
 			await voice.move_to(voice_channel)
-		ydl = YTDLSource()
 
+		ydl = YTDLSource()
 		event_loop = asyncio.get_event_loop()
 		await ctx.send("Подождите немного")
 		with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
-			info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(url,download=False))
-		URL = info
-		for i in URL['entries']:
+			info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(url,download=False,process=False))
+		URL = info['entries']
+		print(URL)
+		for i in URL:
+			link = 'https://www.youtube.com/watch?v=' + i['url']
 			try:
-				await loop_add(ctx, voice, i ,ctx.channel.guild.id, 0)
+				with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
+					current_info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(link,download=False))
+				await loop_add(ctx, voice, current_info ,ctx.channel.guild.id, 0)
 			except:
 				pass
 		await ctx.send("**Плейлист добавлен**")
@@ -401,33 +395,7 @@ async def _playlist(ctx,url, tmp = 1):
 		await ctx.send("Скорее всего вы еще не в голосовом чате")
 	except Exception as e:
 		print(e)
-		if tmp == 0:
-			await add_playlist(ctx,url, 0)
-		elif tmp == 1:
-			await add_playlist(ctx,url)
 
-async def add_playlist(ctx,url, tmp = 1):
-	try:
-		voice = ctx.channel.guild.voice_client
-		ydl = YTDLSource()
-
-		event_loop = asyncio.get_event_loop()
-		with YoutubeDL(ydl.YDL_OPTIONS) as ydl1:
-			info = await event_loop.run_in_executor(None, lambda:ydl1.extract_info(url,download=False))
-		URL = info
-		for i in URL['entries']:
-			await loop_add(ctx, voice, i ,ctx.channel.guild.id, 0)
-		await ctx.send("**Плейлист добавлен**")
-		if tmp == 0:
-			tmp = 1
-			await audio_player_task(ctx, voice, ctx.channel.guild.id)
-
-
-	except Exception as e:
-		if tmp == 0:
-			await add_playlist(ctx,url, 0)
-		else:
-			await add_playlist(ctx,url)
 
 
 @client.command(name='loop')
