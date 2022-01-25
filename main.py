@@ -9,7 +9,7 @@ from youtube_dl import YoutubeDL
 import math
 import random
 
-TOKEN = os.environ['VAR_NAME']
+TOKEN = os.environ['TOKEN']
 
 
 from youtubesearchpython import VideosSearch
