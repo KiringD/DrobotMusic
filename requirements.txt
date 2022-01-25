@@ -4,4 +4,3 @@ asyncio
 PyNaCl
 youtube-search-python
 boto
-os
