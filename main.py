@@ -10,7 +10,7 @@ import math
 import random
 
 from boto.s3.connection import S3Connection
-TOKEN = S3Connection(os.environ['TOKEN'])
+TOKEN = S3Connection(os.environ['S3_KEY'], os.environ['TOKEN'])
 
 from youtubesearchpython import VideosSearch
 
