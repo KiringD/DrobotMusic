@@ -9,8 +9,8 @@ from youtube_dl import YoutubeDL
 import math
 import random
 
-from boto.s3.connection import S3Connection
-TOKEN = S3Connection(os.environ['S3_KEY'], os.environ['TOKEN'])
+TOKEN = os.environ['VAR_NAME']
+
 
 from youtubesearchpython import VideosSearch
 
