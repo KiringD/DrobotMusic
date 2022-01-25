@@ -9,8 +9,7 @@ from youtube_dl import YoutubeDL
 import math
 import random
 
-TOKEN = os.environ.get('TOKEN')
-print(TOKEN)
+TOKEN = os.environ['TOKEN']
 
 
 from youtubesearchpython import VideosSearch
