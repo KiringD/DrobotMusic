@@ -1,14 +1,15 @@
 import asyncio
 import discord
 
-import config
-
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 from discord import TextChannel
 from youtube_dl import YoutubeDL
 import math
 import random
+
+from boto.s3.connection import S3Connection
+TOKEN = S3Connection(os.environ['TOKEN'])
 
 from youtubesearchpython import VideosSearch
 
@@ -572,4 +573,4 @@ async def _r(ctx, del_id):
 		# print(e,2)
 		await ctx.send("Что то пошло не так")
 
-client.run(config.TOKEN)
+client.run(TOKEN)
