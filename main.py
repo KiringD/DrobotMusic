@@ -19,6 +19,7 @@ client = commands.Bot(command_prefix='-')  # prefix our commands with '.'
 queues = {} 
 is_loop = {}
 last_song={}
+is_adding={}
 
 
 @client.event  # check if bot is readyd
@@ -137,9 +138,22 @@ async def audio_player_task(ctx, voice, id):
 		timer += 1
 		if id in queues:
 			if queues[id] == ['final']:
-				queues.pop(id)
-				is_loop.pop(id)
-				last_song.pop(id)
+				try:
+					queues.pop(id)
+				except:
+					pass
+				try:
+					is_loop.pop(id)
+				except:
+					pass
+				try:	
+					last_song.pop(id)
+				except:
+					pass
+				try:
+					await voice.disconnect()
+				except:
+					pass
 				break
 		try:
 			if not voice.is_playing() and not voice.is_paused():
@@ -154,13 +168,11 @@ async def audio_player_task(ctx, voice, id):
 		except Exception as e:
 			# print(e,2)
 			await asyncio.sleep(1)
-		if timer >= 1800:
+		if timer >= 1800 and id not in is_adding:
 			try:
-				queues.pop(id)
-			except KeyError:
-				pass
-			await voice.disconnect()
-			break
+				queues[id] = ['final']
+			except KeyError as e:
+				# print(e)
 
 
 
@@ -373,6 +385,7 @@ async def _playlist(ctx,url, tmp = 1):
 		elif voice.channel != voice_channel:
 			await voice.move_to(voice_channel)
 
+		is_adding[ctx.channel.guild.id] = 1
 		ydl = YTDLSource()
 		event_loop = asyncio.get_event_loop()
 		await ctx.send("Подождите немного")
@@ -388,6 +401,8 @@ async def _playlist(ctx,url, tmp = 1):
 				await loop_add(ctx, voice, current_info ,ctx.channel.guild.id, 0)
 			except:
 				pass
+
+		is_adding.pop(ctx.channel.guild.id)
 		await ctx.send("**Плейлист добавлен**")
 		if tmp == 0:
 			tmp = 1
@@ -538,11 +553,14 @@ async def _leave(ctx):
 	"""Убирает бота из голосового чата"""
 	try:
 		voice = ctx.channel.guild.voice_client
-		if ctx.channel.guild.id in queues:
-			queues[ctx.channel.guild.id] = ['final']
+
 		if voice.is_playing() or voice.is_paused():
 			voice.stop()
 		await voice.disconnect()
+		if ctx.channel.guild.id in queues:
+			while ctx.channel.guild.id in is_adding:
+				await asyncio.sleep(1)
+			queues[ctx.channel.guild.id] = ['final']
 		
 	except Exception as e:
 		# print(e,2)
