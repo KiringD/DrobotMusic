@@ -172,7 +172,7 @@ async def audio_player_task(ctx, voice, id):
 			try:
 				queues[id] = ['final']
 			except KeyError as e:
-				# print(e)
+				pass
 
 
 
