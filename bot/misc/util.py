@@ -2,7 +2,7 @@ import asyncio
 
 import nextcord
 from nextcord import FFmpegPCMAudio
-from yt_dlp import YoutubeDL
+from youtube_dl import YoutubeDL
 
 from ..handlers.user.main import guilds_objects
 

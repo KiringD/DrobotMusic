@@ -3,7 +3,7 @@ import random
 
 import nextcord
 from nextcord.ext import commands
-from yt_dlp import YoutubeDL
+from youtube_dl import YoutubeDL
 
 guilds_objects = {}
 

@@ -1,4 +1,4 @@
 PyNaCl
 nextcord
-yt_dlp
+youtube_dl
 configparser
