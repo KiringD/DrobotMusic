@@ -1,5 +1,4 @@
-youtube-dl
-discord.py
-asyncio
 PyNaCl
-youtube-search-python
+nextcord
+yt_dlp
+configparser

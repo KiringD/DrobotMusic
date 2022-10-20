@@ -1,5 +1,5 @@
 # DroBotMusic
-### Version 0.8
+### Version 1.0
 
 ## Discription
 An absolutely free and open software solution in the field of music bots for discord. Bot waits prefix "-" before any command.
