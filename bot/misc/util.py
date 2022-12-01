@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import nextcord
 from nextcord import FFmpegPCMAudio
@@ -16,7 +17,7 @@ class YTDLSource():
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,
-        'ignoreerrors': False,
+        'ignoreerrors': True,
         'logtostderr': False,
         'quiet': True,
         'no_warnings': True,
@@ -33,7 +34,7 @@ class YTDLSource():
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,
-        'ignoreerrors': False,
+        'ignoreerrors': True,
         'logtostderr': False,
         'quiet': True,
         'no_warnings': True,
@@ -118,6 +119,7 @@ async def loop_add(ctx, info, guild_id, need_message=True, pos=-2):
     except KeyError:
         pass
     except Exception as e:
+        logging.warning(e)
         await ctx.send('Что то пошло не так')
 
 
@@ -132,9 +134,11 @@ async def player(ctx, voice, info, guild_id):
 # print(queues)
 
 async def audio_player_task(ctx, voice, guild_id):
+    global_timer = 0
     timer = 0
     while True:
         timer += 1
+        global_timer += 1
         if guild_id in guilds_objects:
             if guilds_objects[guild_id].queue == ['final']:
                 try:
@@ -147,6 +151,7 @@ async def audio_player_task(ctx, voice, guild_id):
                     pass
                 break
         if not voice.is_playing() and not voice.is_paused() and len(guilds_objects[guild_id].queue) != 0:
+            global_timer = 0
             guilds_objects[guild_id].playing_song = guilds_objects[guild_id].queue[0]
             await player(ctx, voice, guilds_objects[guild_id].queue[0], guild_id)
         if voice.is_playing():
@@ -155,7 +160,7 @@ async def audio_player_task(ctx, voice, guild_id):
             guilds_objects[guild_id].playing_song = ""
         await asyncio.sleep(1)
 
-        if timer >= 1800:
+        if timer >= 1800 or global_timer >= 7200:
             try:
                 guilds_objects[guild_id].queue = ['final']
             except KeyError as e:
